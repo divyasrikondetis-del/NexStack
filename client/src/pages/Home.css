@@ -1,0 +1,270 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+}
+
+/* ================= HERO ================= */
+
+.home-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  padding: 35px;
+  background: linear-gradient(135deg, #eef6ff, #ffffff);
+  border: 1px solid #d6e9ff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.home-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: #0a95ff;
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.home-hero h1 {
+  margin: 0;
+  font-size: 40px;
+  color: #1f2937;
+}
+
+.home-intro {
+  margin-top: 15px;
+  color: #555;
+  line-height: 1.8;
+  max-width: 650px;
+}
+
+.primary-button {
+  background: #0a95ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.primary-button:hover {
+  background: #0074cc;
+  transform: translateY(-2px);
+}
+
+/* ================= SUMMARY ================= */
+
+.home-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 3px 10px rgba(0,0,0,.05);
+  transition: .3s;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.08);
+}
+
+.summary-card h4 {
+  margin: 0;
+  font-size: 28px;
+  color: #0a95ff;
+}
+
+.summary-card p {
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ================= FILTER SECTION ================= */
+
+.home-filters {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 25px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+
+.home-filters .left {
+  margin-bottom: 18px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 32px;
+  color: #1f2937;
+}
+
+.text-muted {
+  color: #666;
+  margin-top: 6px;
+}
+
+/* ================= SEARCH ================= */
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  outline: none;
+  font-size: 15px;
+  margin-bottom: 20px;
+  transition: .2s;
+}
+
+.search-input:focus {
+  border-color: #0a95ff;
+  box-shadow: 0 0 0 3px rgba(10,149,255,.15);
+}
+
+/* ================= FILTER BUTTONS ================= */
+
+.filter-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-button {
+  border: 1px solid #d0d7de;
+  background: white;
+  padding: 10px 18px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: .25s;
+  font-size: 14px;
+}
+
+.filter-button:hover {
+  background: #0a95ff;
+  color: white;
+  border-color: #0a95ff;
+}
+
+.filter-button.active {
+  background: #0a95ff;
+  color: white;
+  border-color: #0a95ff;
+}
+
+/* ================= TAGS ================= */
+
+.tag-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tag-buttons button {
+  border: none;
+  background: #edf2f7;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: .25s;
+  font-size: 13px;
+}
+
+.tag-buttons button:hover {
+  background: #0a95ff;
+  color: white;
+}
+
+.tag-buttons button.active {
+  background: #0a95ff;
+  color: white;
+}
+
+/* ================= QUESTION LIST ================= */
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ================= LOADING ================= */
+
+.home-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width:900px){
+
+.home-hero{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.home-summary{
+grid-template-columns:1fr;
+}
+
+}
+
+@media (max-width:700px){
+
+.home-page{
+padding:15px;
+}
+
+.home-hero{
+padding:25px;
+}
+
+.home-hero h1{
+font-size:30px;
+}
+
+.primary-button{
+width:100%;
+}
+
+.home-filters{
+padding:18px;
+}
+
+.filter-group{
+flex-direction:column;
+}
+
+.filter-button{
+width:100%;
+}
+
+.search-input{
+font-size:14px;
+}
+
+.tag-buttons{
+gap:8px;
+}
+
+}

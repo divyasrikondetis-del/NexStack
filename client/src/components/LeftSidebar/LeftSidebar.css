@@ -1,0 +1,20 @@
+.left-sidebar {
+  width: 220px;
+  min-height: 100vh;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+.left-sidebar ul {
+  list-style: none;
+}
+
+.left-sidebar li {
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.left-sidebar li:hover {
+  background-color: #f1f2f3;
+}
