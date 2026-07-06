@@ -1,7 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
+
+// Load env ONLY in development
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const userRoutes = require("./routes/users");
 const questionRoutes = require("./routes/questions");
@@ -20,8 +24,20 @@ app.use("/questions", questionRoutes);
 app.use("/answers", answerRoutes);
 app.use("/jobs", jobRoutes);
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+// Test route
+app.get("/", (req, res) => {
+  res.send("🚀 Stack Overflow API is running...");
+});
+
+// MongoDB connection (IMPORTANT FIX HERE)
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  console.error("❌ MONGO_URI is missing in environment variables");
+}
+
+mongoose
+  .connect(MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");
   })
@@ -29,11 +45,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("❌ MongoDB Connection Error:", err);
   });
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("🚀 Stack Overflow API is running...");
-});
-
+// Start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
