@@ -2,38 +2,61 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-// Load env ONLY in development
+// Load .env in development
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
+// ========================
+// Import Routes
+// ========================
 const userRoutes = require("./routes/users");
 const questionRoutes = require("./routes/questions");
 const answerRoutes = require("./routes/answers");
 const jobRoutes = require("./routes/jobs");
+const forgotPasswordRoutes = require("./routes/forgotPassword");
+const postRoutes = require("./routes/posts");
+const adminRoutes = require("./routes/admin");
+
+// ✅ Notifications Route
+const notificationRoutes = require("./routes/notifications");
 
 const app = express();
 
+// ========================
 // Middleware
+// ========================
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// ========================
+// API Routes
+// ========================
 app.use("/users", userRoutes);
 app.use("/questions", questionRoutes);
 app.use("/answers", answerRoutes);
 app.use("/jobs", jobRoutes);
+app.use("/forgot-password", forgotPasswordRoutes);
+app.use("/posts", postRoutes);
+app.use("/admin", adminRoutes);
 
-// Test route
+// ✅ Notification API
+app.use("/notifications", notificationRoutes);
+
+// ========================
+// Home Route
+// ========================
 app.get("/", (req, res) => {
-  res.send("🚀 Stack Overflow API is running...");
+  res.send("🚀 NexStack API is running...");
 });
 
-// MongoDB connection (IMPORTANT FIX HERE)
+// ========================
+// MongoDB Connection
+// ========================
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-  console.error("❌ MONGO_URI is missing in environment variables");
+  console.error("❌ MONGO_URI is missing in .env");
 }
 
 mongoose
@@ -42,12 +65,14 @@ mongoose
     console.log("✅ MongoDB Connected");
   })
   .catch((err) => {
-    console.log("❌ MongoDB Connection Error:", err);
+    console.error("❌ MongoDB Connection Error:", err);
   });
 
-// Start server
+// ========================
+// Start Server
+// ========================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
