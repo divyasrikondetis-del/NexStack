@@ -1,0 +1,140 @@
+:root {
+  --text: #3b3f46;
+  --text-h: #111827;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --border: #d4d8e3;
+  --accent: #0e76ff;
+  --accent-soft: rgba(14, 118, 255, 0.12);
+  --accent-dark: #0759c8;
+  --shadow: rgba(15, 23, 42, 0.08) 0 10px 24px -8px;
+  --shadow-strong: rgba(15, 23, 42, 0.12) 0 18px 40px -12px;
+  --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --heading: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  font: 16px/1.6 var(--sans);
+  letter-spacing: 0.2px;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eef2fb 0%, #f7f9fe 60%, #f4f6fb 100%);
+}
+
+#root {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 0 18px 40px;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 24px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  background: var(--accent-dark);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.page-heading {
+  color: var(--text-h);
+  margin: 0;
+}
+
+.section-title {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  color: var(--text-h);
+}
+
+.text-muted {
+  color: #6b7280;
+}
+
+.filter-button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.filter-button.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.empty-state {
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: #6b7280;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  #root {
+    padding: 0 14px 30px;
+  }
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}

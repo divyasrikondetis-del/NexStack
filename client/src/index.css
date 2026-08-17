@@ -1,0 +1,29 @@
+:root {
+  --text: #3b3f46;
+  --text-h: #111827;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --border: #d4d8e3;
+  --accent: #0e76ff;
+  --accent-soft: rgba(14, 118, 255, 0.12);
+  --accent-dark: #0759c8;
+  --shadow: rgba(15, 23, 42, 0.08) 0 10px 24px -8px;
+  --shadow-strong: rgba(15, 23, 42, 0.12) 0 18px 40px -12px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

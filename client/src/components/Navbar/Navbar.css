@@ -1,0 +1,58 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 30px;
+    border-bottom:1px solid #ddd;
+    background:#fff;
+}
+
+.nav-left{
+    display:flex;
+    align-items:center;
+    gap:25px;
+}
+
+.logo{
+    color:#f48024;
+    cursor:pointer;
+}
+
+.nav-left a{
+    text-decoration:none;
+    color:#555;
+}
+
+.nav-middle input{
+    width:450px;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+.nav-right{
+    display:flex;
+    gap:10px;
+}
+
+.login-btn{
+    padding:8px 16px;
+    border:1px solid #0a95ff;
+    background:white;
+    color:#0a95ff;
+    cursor:pointer;
+}
+
+.signup-btn{
+    padding:8px 16px;
+    border:none;
+    background:#0a95ff;
+    color:white;
+    cursor:pointer;
+}

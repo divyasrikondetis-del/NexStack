@@ -1,0 +1,419 @@
+import { useEffect, useState, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { 
+  fetchQuestionById, 
+  fetchAnswers, 
+  addAnswer, 
+  voteQuestion, 
+  deleteQuestion, 
+  voteAnswer, 
+  deleteAnswer,
+  acceptAnswer,
+  translateBatch,
+} from "../api";
+import { useLanguage } from "../contexts/LanguageContext";
+
+function QuestionDetail() {
+  const { id } = useParams();
+  const { t, language } = useLanguage();
+  const [question, setQuestion] = useState(null);
+  const [answers, setAnswers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [answerText, setAnswerText] = useState("");
+  const [success, setSuccess] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+
+  const loadQuestion = useCallback(async () => {
+    try {
+      const [questionResponse, answersResponse] = await Promise.all([
+        fetchQuestionById(id),
+        fetchAnswers(id),
+      ]);
+
+      let currentQuestion = questionResponse.data;
+      let translatedAnswers = answersResponse.data || [];
+
+      if (language && language !== "en") {
+        try {
+          const questionTexts = [currentQuestion.title, currentQuestion.description];
+          const answerTexts = translatedAnswers.map((answer) => answer.content || "");
+          const translatedTexts = await translateBatch([...questionTexts, ...answerTexts], language);
+          const flattened = translatedTexts.data.translatedTexts || [];
+
+          currentQuestion = {
+            ...currentQuestion,
+            title: flattened[0] || currentQuestion.title,
+            description: flattened[1] || currentQuestion.description,
+          };
+          translatedAnswers = translatedAnswers.map((answer, index) => ({
+            ...answer,
+            content: flattened[2 + index] || answer.content,
+          }));
+        } catch (translateError) {
+          console.error("Translation error for question detail", translateError);
+        }
+      }
+
+      setQuestion(currentQuestion);
+      setAnswers(translatedAnswers);
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Question not found");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, language]);
+
+  useEffect(() => {
+    if (id) {
+      loadQuestion();
+    }
+  }, [id, loadQuestion]);
+
+  const handleAnswerSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!currentUser) {
+      setError("Please log in to post an answer.");
+      return;
+    }
+
+    if (!answerText.trim()) {
+      setError("Answer cannot be empty.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await addAnswer(id, {
+        content: answerText.trim(),
+        user: currentUser._id,
+      });
+      setAnswerText("");
+      setSuccess("✅ Answer posted! +5 reputation awarded!");
+      await loadQuestion();
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Unable to submit answer.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ✅ FIXED ACCEPT ANSWER FUNCTION - using the imported API function
+  const handleAcceptAnswer = async (answerId) => {
+    if (!currentUser) {
+      setError("Please log in to accept an answer.");
+      return;
+    }
+
+    if (question.user._id !== currentUser._id) {
+      setError("Only the question owner can accept an answer.");
+      return;
+    }
+
+    try {
+      const response = await acceptAnswer(answerId);  // ✅ Using imported function
+      setSuccess("✅ " + response.data.message);
+      await loadQuestion();
+    } catch (err) {
+      console.error(err);
+      setError("❌ " + (err.response?.data?.message || "Unable to accept answer."));
+    }
+  };
+
+  const handleVoteQuestion = async (vote) => {
+    try {
+      if (!currentUser) {
+        setError("Please log in to vote on a question.");
+        return;
+      }
+
+      const response = await voteQuestion(id, vote);
+      setQuestion((prev) => (prev ? { ...prev, votes: response.data.votes } : prev));
+      setSuccess("Vote recorded.");
+    } catch (e) {
+      console.error(e);
+      setError(e.response?.data?.message || "Unable to vote on question.");
+    }
+  };
+
+  const handleDeleteQuestion = async () => {
+    if (!window.confirm("Delete this question? This action cannot be undone.")) return;
+    try {
+      await deleteQuestion(id);
+      window.location.href = "/questions";
+    } catch (e) {
+      console.error(e);
+      setError("Unable to delete question.");
+    }
+  };
+
+  const handleVoteAnswer = async (answerId, v) => {
+    try {
+      if (!currentUser) {
+        setError("Please log in to vote on an answer.");
+        return;
+      }
+
+      const response = await voteAnswer(answerId, v);
+      setAnswers((prev) =>
+        prev.map((answer) =>
+          answer._id === answerId ? { ...answer, votes: response.data.votes } : answer
+        )
+      );
+      setSuccess("Vote recorded.");
+    } catch (e) {
+      console.error(e);
+      setError(e.response?.data?.message || "Unable to vote on answer.");
+    }
+  };
+
+  const handleDeleteAnswer = async (answerId) => {
+    if (!window.confirm("Delete this answer?")) return;
+    try {
+      await deleteAnswer(answerId);
+      setSuccess("✅ Answer deleted. -5 reputation.");
+      await loadQuestion();
+    } catch (e) {
+      console.error(e);
+      setError("Unable to delete answer.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ flex: 1, padding: "20px" }}>
+        <h2>Loading question...</h2>
+      </div>
+    );
+  }
+
+  if (error || !question) {
+    return (
+      <div style={{ flex: 1, padding: "20px" }}>
+        <h2 style={{ color: "red" }}>{error || "Question not found"}</h2>
+        <Link to="/questions">
+          <button style={{
+            background: "#0a95ff",
+            color: "white",
+            border: "none",
+            padding: "10px 15px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginTop: "10px"
+          }}>
+            Back to Questions
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ flex: 1, padding: "20px" }}>
+      <h1>{question.title}</h1>
+
+      <div style={{
+        margin: "20px 0",
+        padding: "20px",
+        background: "#f8f9fa",
+        borderRadius: "5px"
+      }}>
+        <p style={{ fontSize: "16px", lineHeight: "1.8" }}>
+          {question.description}
+        </p>
+      </div>
+
+      <div style={{ marginTop: "15px" }}>
+        {question.tags?.map((tag, i) => (
+          <span
+            key={i}
+            style={{
+              marginRight: "6px",
+              marginBottom: "6px",
+              display: "inline-block",
+              padding: "6px 12px",
+              background: "#e1ecf4",
+              color: "#39739d",
+              borderRadius: "5px",
+              fontSize: "13px"
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <div style={{
+        marginTop: "24px",
+        padding: "18px",
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        background: "#ffffff"
+      }}>
+        <p><strong>Asked by:</strong> {question.user?.name || question.user?.email || "Unknown User"}</p>
+        <p><strong>Created:</strong> {new Date(question.createdAt).toLocaleDateString()}</p>
+        <p><strong>Views:</strong> {question.views || 0}</p>
+        <p style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <strong>Votes:</strong>
+          <button onClick={() => handleVoteQuestion(1)} style={{ background: "#e6f4ff", border: "1px solid #cfefff", padding: "6px", borderRadius: "6px", cursor: "pointer" }}>▲</button>
+          <span>{question.votes || 0}</span>
+          <button onClick={() => handleVoteQuestion(-1)} style={{ background: "#fff1f0", border: "1px solid #ffd6d6", padding: "6px", borderRadius: "6px", cursor: "pointer" }}>▼</button>
+        </p>
+
+        {currentUser && currentUser._id === question.user?._id && (
+          <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
+            <Link to={`/ask?id=${id}&edit=true`}>
+              <button style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ddd", background: "white", cursor: "pointer" }}>Edit</button>
+            </Link>
+            <button onClick={handleDeleteQuestion} style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #e74c3c", background: "#ffeded", color: "#b91c1c", cursor: "pointer" }}>Delete</button>
+          </div>
+        )}
+      </div>
+
+      <section style={{ marginTop: "30px" }}>
+        <h2>{answers.length ? `${answers.length} Answer${answers.length > 1 ? "s" : ""}` : "No answers yet"}</h2>
+
+        {success && (
+          <div style={{ marginBottom: "16px", padding: "12px", borderRadius: "8px", background: "#d1fae5", color: "#064e3b" }}>
+            {success}
+          </div>
+        )}
+
+        {error && (
+          <div style={{ marginBottom: "16px", padding: "12px", borderRadius: "8px", background: "#f8d7da", color: "#842029" }}>
+            {error}
+          </div>
+        )}
+
+        {answers.length > 0 && answers.map((answer) => (
+          <div
+            key={answer._id}
+            style={{
+              marginTop: "16px",
+              padding: "18px",
+              borderRadius: "10px",
+              background: answer.isAccepted ? "#d4edda" : "#f8fafc",
+              border: answer.isAccepted ? "2px solid #28a745" : "1px solid #e2e8f0",
+              display: "flex",
+              gap: "12px"
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", minWidth: "56px" }}>
+              <button onClick={() => handleVoteAnswer(answer._id, 1)} style={{ background: "#e6f4ff", border: "1px solid #cfefff", padding: "6px", borderRadius: "6px", cursor: "pointer" }}>▲</button>
+              <strong>{answer.votes || 0}</strong>
+              <button onClick={() => handleVoteAnswer(answer._id, -1)} style={{ background: "#fff1f0", border: "1px solid #ffd6d6", padding: "6px", borderRadius: "6px", cursor: "pointer" }}>▼</button>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <p style={{ marginBottom: "10px", lineHeight: "1.8" }}>{answer.content}</p>
+              
+              {/* ✅ ACCEPT ANSWER BUTTON */}
+              {currentUser && question.user?._id === currentUser._id && (
+                <div style={{ marginBottom: "10px" }}>
+                  {answer.isAccepted ? (
+                    <span style={{ color: "#28a745", fontWeight: "bold", fontSize: "14px" }}>
+                      ✅ Accepted Answer
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleAcceptAnswer(answer._id)}
+                      style={{
+                        background: "#28a745",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 14px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                      }}
+                    >
+                      ✅ Accept Answer (+10 Reputation)
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {answer.isAccepted && (
+                <span style={{ color: "#28a745", fontWeight: "bold", fontSize: "13px", marginRight: "10px" }}>
+                  ★ Best Answer
+                </span>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "space-between", color: "#475569", fontSize: "14px" }}>
+                <span>Answered by: {answer.user?.name || answer.user?.email || "Anonymous"}</span>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <span>{new Date(answer.createdAt).toLocaleDateString()}</span>
+                  {currentUser && currentUser._id === answer.user?._id && (
+                    <button onClick={() => handleDeleteAnswer(answer._id)} style={{ padding: "6px 8px", borderRadius: "6px", border: "1px solid #e74c3c", background: "#fff0f0", color: "#b91c1c", cursor: "pointer" }}>Delete</button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section style={{ marginTop: "32px" }}>
+        <h2>Post an answer</h2>
+
+        {currentUser ? (
+          <form onSubmit={handleAnswerSubmit}>
+            <textarea
+              value={answerText}
+              onChange={(e) => setAnswerText(e.target.value)}
+              rows={6}
+              placeholder="Write your answer here... (+5 reputation)"
+              style={{ width: "100%", padding: "14px", border: "1px solid #d1d5db", borderRadius: "10px", fontSize: "14px", resize: "vertical" }}
+            />
+
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                marginTop: "14px",
+                padding: "12px 20px",
+                background: "#0a95ff",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer"
+              }}
+            >
+              {submitting ? "Submitting..." : "Post Answer (+5 Reputation)"}
+            </button>
+          </form>
+        ) : (
+          <p>
+            Please <Link to="/login">log in</Link> to post an answer.
+          </p>
+        )}
+      </section>
+
+      <Link to="/questions">
+        <button
+          style={{
+            marginTop: "24px",
+            background: "#0a95ff",
+            color: "white",
+            border: "none",
+            padding: "10px 15px",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          ? Back to Questions
+        </button>
+      </Link>
+    </div>
+  );
+}
+
+export default QuestionDetail;
