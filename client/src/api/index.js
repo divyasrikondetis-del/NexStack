@@ -1,12 +1,29 @@
 import axios from "axios";
 
-// ✅ Use environment variable for production, fallback to localhost for development
-const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// =====================================================
+// API BASE URL
+// =====================================================
+// Local development:
+//   VITE_API_URL=http://localhost:5000/api
+//
+// Production:
+//   VITE_API_URL=https://nexstack-3.onrender.com/api
+//
+// If VITE_API_URL is not provided, localhost is used.
+// =====================================================
+
+const rawApiUrl =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const API_URL = rawApiUrl.endsWith("/api")
   ? rawApiUrl
-  : rawApiUrl.replace(/\/$/, "") + "/api";
+  : `${rawApiUrl.replace(/\/$/, "")}/api`;
 
 console.log("📍 API Base URL:", API_URL);
+
+// =====================================================
+// Axios instance
+// =====================================================
 
 const API = axios.create({
   baseURL: API_URL,
@@ -15,244 +32,492 @@ const API = axios.create({
   },
 });
 
-// Add token to every request
+// =====================================================
+// Add JWT token to every request
+// =====================================================
+
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`📨 ${config.method?.toUpperCase() || 'GET'} ${config.url}`);
-    console.log(`📍 Full URL: ${config.baseURL}${config.url}`);
+
+    console.log(
+      `📨 ${config.method?.toUpperCase() || "GET"} ${config.url}`
+    );
+
+    console.log(
+      `📍 Full URL: ${config.baseURL}${config.url}`
+    );
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Handle 401 responses
+// =====================================================
+// Handle unauthorized responses
+// =====================================================
+
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );
 
-// =======================
-// ✅ FIXED User APIs
-// =======================
-export const fetchUsers = () => API.get("/users");
-export const fetchUserById = (id) => API.get(`/users/${id}`);
-export const createUser = (userData) => API.post("/users", userData);
+// =====================================================
+// USER APIs
+// =====================================================
 
-// ✅ FIXED: Use fetch instead of axios for login
+export const fetchUsers = () => API.get("/users");
+
+export const fetchUserById = (id) =>
+  API.get(`/users/${id}`);
+
+export const createUser = (userData) =>
+  API.post("/users", userData);
+
 export const loginUser = async (credentials) => {
-  console.log('🔐 Login attempt:', { email: credentials.email });
-  
+  console.log("🔐 Login attempt:", {
+    email: credentials.email,
+  });
+
   try {
     const response = await fetch(`${API_URL}/users/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify(credentials),
     });
-    
+
     const data = await response.json();
-    console.log('📊 Login response status:', response.status);
-    console.log('📊 Login response data:', data);
+
+    console.log("📊 Login response status:", response.status);
+    console.log("📊 Login response data:", data);
 
     if (!response.ok) {
-      const error = new Error(data.message || 'Login failed');
-      error.response = { data, status: response.status };
+      const error = new Error(
+        data.message || "Login failed"
+      );
+
+      error.response = {
+        data,
+        status: response.status,
+      };
+
       throw error;
     }
-    
-    // ✅ Return in axios-like format
+
     return {
-      data: data,
+      data,
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
-      config: { url: '/users/login', method: 'post' },
-    };
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    throw error;
-  }
-};
-
-// ✅ FIXED: Use fetch instead of axios for OTP verification
-export const verifyLoginOtp = async (payload) => {
-  console.log('🔐 OTP verification for:', payload.email);
-  
-  try {
-    const response = await fetch(`${API_URL}/users/login/verify-otp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+      config: {
+        url: "/users/login",
+        method: "post",
       },
-      body: JSON.stringify(payload),
-    });
-    
-    const data = await response.json();
-    console.log('📊 OTP response status:', response.status);
-    console.log('📊 OTP response data:', data);
-
-    if (!response.ok) {
-      const error = new Error(data.message || 'OTP verification failed');
-      error.response = { data, status: response.status };
-      throw error;
-    }
-    
-    return {
-      data: data,
-      status: response.status,
-      statusText: response.statusText,
-      headers: response.headers,
-      config: { url: '/users/login/verify-otp', method: 'post' },
     };
   } catch (error) {
-    console.error('❌ OTP error:', error);
+    console.error("❌ Login error:", error);
     throw error;
   }
 };
 
-// ... rest of your APIs (keep them the same)
+export const verifyLoginOtp = async (payload) => {
+  console.log(
+    "🔐 OTP verification for:",
+    payload.email
+  );
 
-export const fetchUserSessions = (id) => API.get(`/users/${id}/sessions`);
-export const revokeUserSession = (sessionId) => API.delete(`/users/sessions/${sessionId}`);
-export const trustUserSession = (sessionId) => API.patch(`/users/sessions/${sessionId}/trust`);
-export const updateUser = (id, userData) => API.patch(`/users/${id}`, userData);
+  try {
+    const response = await fetch(
+      `${API_URL}/users/login/verify-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(
+      "📊 OTP response status:",
+      response.status
+    );
+
+    console.log(
+      "📊 OTP response data:",
+      data
+    );
+
+    if (!response.ok) {
+      const error = new Error(
+        data.message || "OTP verification failed"
+      );
+
+      error.response = {
+        data,
+        status: response.status,
+      };
+
+      throw error;
+    }
+
+    return {
+      data,
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      config: {
+        url: "/users/login/verify-otp",
+        method: "post",
+      },
+    };
+  } catch (error) {
+    console.error("❌ OTP error:", error);
+    throw error;
+  }
+};
+
+export const fetchUserSessions = (id) =>
+  API.get(`/users/${id}/sessions`);
+
+export const revokeUserSession = (sessionId) =>
+  API.delete(`/users/sessions/${sessionId}`);
+
+export const trustUserSession = (sessionId) =>
+  API.patch(`/users/sessions/${sessionId}/trust`);
+
+export const updateUser = (id, userData) =>
+  API.patch(`/users/${id}`, userData);
+
 export const followUser = (userId, targetUserId) =>
-  API.patch("/users/follow", { userId, targetUserId });
-export const setUserSuspension = (id, adminId, duration, reason = "") =>
-  API.patch(`/users/${id}/suspension`, { adminId, duration, reason });
+  API.patch("/users/follow", {
+    userId,
+    targetUserId,
+  });
 
-// =======================
-// Question APIs
-// =======================
-export const fetchQuestions = () => API.get("/questions");
-export const fetchQuestionById = (id) => API.get(`/questions/${id}`);
-export const askQuestion = (questionData) => API.post("/questions", questionData);
-export const updateQuestion = (id, data) => API.patch(`/questions/${id}`, data);
-export const deleteQuestion = (id) => API.delete(`/questions/${id}`);
-export const voteQuestion = (id, vote) => API.patch(`/questions/${id}/vote`, { vote });
+export const setUserSuspension = (
+  id,
+  adminId,
+  duration,
+  reason = ""
+) =>
+  API.patch(`/users/${id}/suspension`, {
+    adminId,
+    duration,
+    reason,
+  });
 
-// =======================
-// Answer APIs
-// =======================
-export const fetchAnswers = (questionId) => API.get(`/answers/${questionId}`);
-export const addAnswer = (questionId, answerData) =>
-  API.post(`/answers/${questionId}`, answerData);
-export const voteAnswer = (id, vote) => API.patch(`/answers/${id}/vote`, { vote });
-export const acceptAnswer = (id) => API.patch(`/answers/${id}/accept`);
-export const deleteAnswer = (id) => API.delete(`/answers/${id}`);
+// =====================================================
+// QUESTION APIs
+// =====================================================
 
-// =======================
-// Job APIs
-// =======================
-export const fetchJobs = () => API.get("/jobs");
-export const fetchJobById = (id) => API.get(`/jobs/${id}`);
-export const postJob = (jobData) => API.post("/jobs", jobData);
-export const deleteJob = (id) => API.delete(`/jobs/${id}`);
+export const fetchQuestions = () =>
+  API.get("/questions");
 
-export const translateText = (text, targetLanguage) =>
-  API.post("/translate", { text, targetLanguage });
+export const fetchQuestionById = (id) =>
+  API.get(`/questions/${id}`);
 
-export const translateBatch = (texts, targetLanguage) =>
-  API.post("/translate/batch", { texts, targetLanguage });
+export const askQuestion = (questionData) =>
+  API.post("/questions", questionData);
 
-// =======================
-// Post APIs
-// =======================
-export const fetchPosts = (page = 1, limit = 10, sort = "-createdAt", hashtag = "", search = "") => {
-  let url = `/posts?page=${page}&limit=${limit}&sort=${sort}`;
-  if (hashtag) url += `&hashtag=${encodeURIComponent(hashtag)}`;
-  if (search) url += `&search=${encodeURIComponent(search)}`;
+export const updateQuestion = (id, data) =>
+  API.patch(`/questions/${id}`, data);
+
+export const deleteQuestion = (id) =>
+  API.delete(`/questions/${id}`);
+
+export const voteQuestion = (id, vote) =>
+  API.patch(`/questions/${id}/vote`, { vote });
+
+// =====================================================
+// ANSWER APIs
+// =====================================================
+
+export const fetchAnswers = (questionId) =>
+  API.get(`/answers/${questionId}`);
+
+export const addAnswer = (
+  questionId,
+  answerData
+) =>
+  API.post(
+    `/answers/${questionId}`,
+    answerData
+  );
+
+export const voteAnswer = (id, vote) =>
+  API.patch(`/answers/${id}/vote`, { vote });
+
+export const acceptAnswer = (id) =>
+  API.patch(`/answers/${id}/accept`);
+
+export const deleteAnswer = (id) =>
+  API.delete(`/answers/${id}`);
+
+// =====================================================
+// JOB APIs
+// =====================================================
+
+export const fetchJobs = () =>
+  API.get("/jobs");
+
+export const fetchJobById = (id) =>
+  API.get(`/jobs/${id}`);
+
+export const postJob = (jobData) =>
+  API.post("/jobs", jobData);
+
+export const deleteJob = (id) =>
+  API.delete(`/jobs/${id}`);
+
+// =====================================================
+// TRANSLATION APIs
+// =====================================================
+
+export const translateText = (
+  text,
+  targetLanguage
+) =>
+  API.post("/translate", {
+    text,
+    targetLanguage,
+  });
+
+export const translateBatch = (
+  texts,
+  targetLanguage
+) =>
+  API.post("/translate/batch", {
+    texts,
+    targetLanguage,
+  });
+
+// =====================================================
+// POST APIs
+// =====================================================
+
+export const fetchPosts = (
+  page = 1,
+  limit = 10,
+  sort = "-createdAt",
+  hashtag = "",
+  search = ""
+) => {
+  let url =
+    `/posts?page=${page}` +
+    `&limit=${limit}` +
+    `&sort=${sort}`;
+
+  if (hashtag) {
+    url += `&hashtag=${encodeURIComponent(hashtag)}`;
+  }
+
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+
   return API.get(url);
 };
-export const fetchTrendingPosts = () => API.get("/posts/trending");
-export const fetchPostsByHashtag = (hashtag) => API.get(`/posts/hashtag/${hashtag}`);
-export const fetchPostById = (id) => API.get(`/posts/${id}`);
-export const fetchUserFeed = (userId, page = 1, limit = 10) =>
-  API.get(`/posts/feed/${userId}?page=${page}&limit=${limit}`);
-export const fetchBookmarkedPosts = (userId) => API.get(`/posts/bookmarks/${userId}`);
-export const fetchReportedPosts = (adminId) => API.get(`/posts/moderation/reported?adminId=${adminId}`);
-export const createPost = (postData) => API.post("/posts", postData);
+
+export const fetchTrendingPosts = () =>
+  API.get("/posts/trending");
+
+export const fetchPostsByHashtag = (hashtag) =>
+  API.get(
+    `/posts/hashtag/${hashtag}`
+  );
+
+export const fetchPostById = (id) =>
+  API.get(`/posts/${id}`);
+
+export const fetchUserFeed = (
+  userId,
+  page = 1,
+  limit = 10
+) =>
+  API.get(
+    `/posts/feed/${userId}?page=${page}&limit=${limit}`
+  );
+
+export const fetchBookmarkedPosts = (userId) =>
+  API.get(`/posts/bookmarks/${userId}`);
+
+export const fetchReportedPosts = (adminId) =>
+  API.get(
+    `/posts/moderation/reported?adminId=${adminId}`
+  );
+
+export const createPost = (postData) =>
+  API.post("/posts", postData);
+
 export const createPostWithImage = (formData) =>
   API.post("/posts/with-image", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
-export const likePost = (id, userId) => API.patch(`/posts/${id}/like`, { userId });
-export const bookmarkPost = (id, userId) => API.patch(`/posts/${id}/bookmark`, { userId });
-export const addComment = (id, commentData) => API.patch(`/posts/${id}/comment`, commentData);
-export const editPost = (id, userId, postData) =>
-  API.patch(`/posts/${id}/edit`, { userId, ...postData });
-export const sharePost = (id) => API.patch(`/posts/${id}/share`);
-export const reportPost = (id, userId, reason) =>
-  API.patch(`/posts/${id}/report`, { userId, reason });
-export const deletePost = (id, userId, isAdmin = false) =>
-  API.delete(`/posts/${id}`, { data: { userId, isAdmin } });
 
-// =======================
-// Notification APIs
-// =======================
+export const likePost = (id, userId) =>
+  API.patch(`/posts/${id}/like`, { userId });
+
+export const bookmarkPost = (id, userId) =>
+  API.patch(`/posts/${id}/bookmark`, { userId });
+
+export const addComment = (id, commentData) =>
+  API.patch(
+    `/posts/${id}/comment`,
+    commentData
+  );
+
+export const editPost = (
+  id,
+  userId,
+  postData
+) =>
+  API.patch(`/posts/${id}/edit`, {
+    userId,
+    ...postData,
+  });
+
+export const sharePost = (id) =>
+  API.patch(`/posts/${id}/share`);
+
+export const reportPost = (
+  id,
+  userId,
+  reason
+) =>
+  API.patch(`/posts/${id}/report`, {
+    userId,
+    reason,
+  });
+
+export const deletePost = (
+  id,
+  userId,
+  isAdmin = false
+) =>
+  API.delete(`/posts/${id}`, {
+    data: {
+      userId,
+      isAdmin,
+    },
+  });
+
+// =====================================================
+// NOTIFICATION APIs
+// =====================================================
+
 export const fetchNotifications = (userId) =>
   API.get(`/notifications/${userId}`);
+
 export const markNotificationRead = (id) =>
   API.patch(`/notifications/${id}/read`);
+
 export const deleteNotification = (id) =>
   API.delete(`/notifications/${id}`);
-export const fetchUnreadCount = (userId) =>
-  API.get(`/notifications/${userId}/unread-count`);
 
-// =======================
-// Reputation APIs
-// =======================
+export const fetchUnreadCount = (userId) =>
+  API.get(
+    `/notifications/${userId}/unread-count`
+  );
+
+// =====================================================
+// REPUTATION APIs
+// =====================================================
+
 export const fetchReputationHistory = (userId) =>
   API.get(`/reputation/${userId}`);
+
 export const transferReputation = (data) =>
   API.post("/reputation/transfer", data);
 
-// =======================
-// Admin APIs
-// =======================
+// =====================================================
+// ADMIN APIs
+// =====================================================
+
 export const fetchAdminDashboard = (adminId) =>
-  API.get(`/admin/dashboard?adminId=${adminId}`);
+  API.get(
+    `/admin/dashboard?adminId=${adminId}`
+  );
+
 export const fetchAdminReports = (adminId) =>
-  API.get(`/admin/reports?adminId=${adminId}`);
+  API.get(
+    `/admin/reports?adminId=${adminId}`
+  );
+
 export const fetchAdminSecurityLogs = (adminId) =>
-  API.get(`/admin/security-logs?adminId=${adminId}`);
-export const reviewAdminReport = (postId, adminId, reportId, action) =>
+  API.get(
+    `/admin/security-logs?adminId=${adminId}`
+  );
+
+export const reviewAdminReport = (
+  postId,
+  adminId,
+  reportId,
+  action
+) =>
   API.patch(`/admin/reports/${postId}`, {
     adminId,
     reportId,
     action,
   });
 
-// =======================
-// Auth APIs
-// =======================
+// =====================================================
+// AUTH APIs
+// =====================================================
+
 export const forgotPassword = (payload) =>
   API.post("/forgot-password", payload);
 
-// =======================
-// Subscription APIs
-// =======================
-export const fetchSubscriptionDashboard = (userId) =>
+// =====================================================
+// SUBSCRIPTION APIs
+// =====================================================
+
+export const fetchSubscriptionDashboard = (
+  userId
+) =>
   API.get(`/subscriptions/${userId}`);
-export const createSubscriptionCheckout = (checkoutData) =>
-  API.post("/subscriptions/checkout", checkoutData);
-export const confirmSubscriptionPayment = (paymentData) =>
-  API.post("/subscriptions/confirm", paymentData);
-export const downloadInvoiceUrl = (userId, paymentId) =>
+
+export const createSubscriptionCheckout = (
+  checkoutData
+) =>
+  API.post(
+    "/subscriptions/checkout",
+    checkoutData
+  );
+
+export const confirmSubscriptionPayment = (
+  paymentData
+) =>
+  API.post(
+    "/subscriptions/confirm",
+    paymentData
+);
+
+export const downloadInvoiceUrl = (
+  userId,
+  paymentId
+) =>
   `${API.defaults.baseURL}/subscriptions/${userId}/invoices/${paymentId}`;
 
 export default API;
