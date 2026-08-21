@@ -87,6 +87,33 @@ app.get("/api/health", (req, res) => {
 });
 
 // ========================
+// Root API Endpoint
+// ========================
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    message: "NexStack API is running",
+    endpoints: {
+      auth: "/api/users",
+      questions: "/api/questions",
+      answers: "/api/answers",
+      jobs: "/api/jobs",
+      posts: "/api/posts",
+      admin: "/api/admin",
+      subscriptions: "/api/subscriptions",
+      notifications: "/api/notifications",
+      reputation: "/api/reputation",
+      translate: "/api/translate",
+      forgotPassword: "/api/forgot-password",
+      health: "/api/health"
+    },
+    status: "online",
+    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ========================
 // Home Route
 // ========================
 app.get("/", (req, res) => {
