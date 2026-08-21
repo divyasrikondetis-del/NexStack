@@ -72,42 +72,6 @@ NexStack is developed using the following technologies and services:
 - GitHub
 - MongoDB cloud database
 
-# 🔐 ENVIRONMENT VARIABLES
-
-Sensitive information is stored in environment variables and must not be committed to GitHub.
-
-### Backend environment
-
-PORT=5000
-NODE_ENV=production
-
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_password
-
-TRANSLATION_API_URL=https://libretranslate.com/translate
-TRANSLATION_API_KEY=your_translation_api_key
-
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=your_webhook_secret
-
-### Frontend environment
-
-For local development:
-
-VITE_API_URL=http://localhost:5000/api
-
-For production:
-
-VITE_API_URL=https://nexstack-3.onrender.com/api
-
-Environment files are excluded using .gitignore.
 
 # 👤 USER AUTHENTICATION
 
