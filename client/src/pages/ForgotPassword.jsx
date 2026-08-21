@@ -22,12 +22,9 @@ function ForgotPassword() {
       setLoading(true);
       const { data } = await forgotPassword({ identifier: normalizedIdentifier });
       const successMessage = data.message || "Password reset email sent successfully.";
-
-      if (data.temporaryPassword) {
-        setMessage(`${successMessage} Your temporary password is: ${data.temporaryPassword}`);
-      } else {
-        setMessage(successMessage);
-      }
+      
+      // ✅ REMOVED: No longer showing temporary password in the UI
+      setMessage(successMessage);
 
       setIdentifier("");
     } catch (err) {
