@@ -16,58 +16,99 @@ The platform is designed as a full-stack web application with a React frontend, 
 
 NexStack/
 │
-├── client/                              # Frontend application
+├── client/
 │   ├── public/
+│   │   ├── favicon.ico
+│   │   └── ...
 │   │
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── index.js                 # Central Axios/API configuration
+│   │   │   └── index.js
 │   │   │
-│   │   ├── assets/                      # Images and frontend assets
+│   │   ├── assets/
+│   │   │   └── ...
 │   │   │
-│   │   ├── components/                  # Reusable React components
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── PostCard.jsx
+│   │   │   ├── Comment.jsx
+│   │   │   ├── Notification.jsx
+│   │   │   └── ...
 │   │   │
 │   │   ├── contexts/
-│   │   │   └── LanguageContext.jsx      # Language management
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── LanguageContext.jsx
 │   │   │
 │   │   ├── pages/
+│   │   │   ├── Home.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
 │   │   │   ├── ForgotPassword.jsx
-│   │   │   ├── Home.jsx
+│   │   │   ├── ResetPassword.jsx
+│   │   │   ├── Profile.jsx
 │   │   │   ├── Questions.jsx
 │   │   │   ├── QuestionDetails.jsx
 │   │   │   ├── AskQuestion.jsx
 │   │   │   ├── Jobs.jsx
 │   │   │   ├── PostJob.jsx
 │   │   │   ├── TransferReputation.jsx
-│   │   │   ├── Profile.jsx
+│   │   │   ├── ReputationHistory.jsx
 │   │   │   ├── Notifications.jsx
+│   │   │   ├── Subscriptions.jsx
+│   │   │   ├── PaymentSuccess.jsx
+│   │   │   ├── PaymentCancel.jsx
 │   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── Subscription.jsx
+│   │   │   ├── AdminReports.jsx
+│   │   │   ├── SecurityLogs.jsx
 │   │   │   └── ...
 │   │   │
 │   │   ├── App.jsx
 │   │   ├── main.jsx
-│   │   └── styles/
+│   │   └── index.css
 │   │
-│   ├── .env
+│   ├── .env                 # Local only, NOT committed
+│   ├── .env.example
 │   ├── package.json
 │   └── vite.config.js
 │
-├── server/                              # Backend application
+├── server/
+│   ├── config/
+│   │   ├── db.js
+│   │   └── ...
+│   │
+│   ├── controllers/
+│   │   ├── userController.js
+│   │   ├── questionController.js
+│   │   ├── answerController.js
+│   │   ├── postController.js
+│   │   ├── jobController.js
+│   │   ├── reputationController.js
+│   │   ├── notificationController.js
+│   │   ├── subscriptionController.js
+│   │   ├── adminController.js
+│   │   └── ...
+│   │
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   ├── adminMiddleware.js
+│   │   ├── uploadMiddleware.js
+│   │   └── ...
+│   │
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Question.js
 │   │   ├── Answer.js
 │   │   ├── Post.js
-│   │   ├── Job.js
+│   │   ├── Comment.js
 │   │   ├── Notification.js
-│   │   ├── Session.js
-│   │   ├── Report.js
 │   │   ├── ReputationHistory.js
 │   │   ├── ReputationTransfer.js
+│   │   ├── Session.js
+│   │   ├── LoginActivity.js
 │   │   ├── Subscription.js
+│   │   ├── Payment.js
+│   │   ├── Job.js
 │   │   └── ...
 │   │
 │   ├── routes/
@@ -76,18 +117,18 @@ NexStack/
 │   │   ├── answerRoutes.js
 │   │   ├── postRoutes.js
 │   │   ├── jobRoutes.js
-│   │   ├── notificationRoutes.js
 │   │   ├── reputationRoutes.js
-│   │   ├── adminRoutes.js
+│   │   ├── notificationRoutes.js
 │   │   ├── subscriptionRoutes.js
+│   │   ├── adminRoutes.js
+│   │   ├── translationRoutes.js
 │   │   └── ...
 │   │
-│   ├── controllers/
-│   │   └── ...
-│   │
-│   ├── middleware/
-│   │   ├── auth.js
-│   │   ├── admin.js
+│   ├── services/
+│   │   ├── emailService.js
+│   │   ├── otpService.js
+│   │   ├── paymentService.js
+│   │   ├── reputationService.js
 │   │   └── ...
 │   │
 │   ├── utils/
@@ -96,15 +137,17 @@ NexStack/
 │   │   ├── translation.js
 │   │   └── ...
 │   │
+│   ├── uploads/
+│   │   └── ...
+│   │
 │   ├── server.js
 │   ├── package.json
-│   ├── .env
+│   ├── .env                 # Local only, NOT committed
 │   └── .env.example
 │
 ├── .gitignore
-└── README.md
-
----
+├── README.md
+└── package.json
 
 # 🛠️ TECHNOLOGIES AND TOOLS USED
 
