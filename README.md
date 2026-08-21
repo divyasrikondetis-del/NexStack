@@ -757,36 +757,8 @@ GitHub is used for:
 Repository:
 
 https://github.com/divyasrikondetis-del/NexStack
-
-## Backend
-
-Backend is deployed using Render.
-
-Production backend:
-
-https://nexstack-3.onrender.com
-
-Health endpoint:
-
-https://nexstack-3.onrender.com/api/health
-
-Expected response:
-
-{
-  "status": "ok",
-  "mongodb": "connected",
-  "timestamp": "..."
-}
-
-## Frontend
-
-The React/Vite frontend can be deployed separately as a static web service.
-
-Production frontend environment variable:
-
-VITE_API_URL=https://nexstack-3.onrender.com/api
-
----
+Backend: https://nexstack-backend.onrender.com
+Frontend: https://nexstack-nine.vercel.app
 
 # 🔄 GIT WORKFLOW
 
