@@ -13,141 +13,143 @@ The platform is designed as a full-stack web application with a React frontend, 
 ---
 
 ## 🏗️ COMPLETE PROJECT STRUCTURE
-
 NexStack/
-│
-├── client/
-│   ├── public/
-│   │   ├── favicon.ico
-│   │   └── ...
-│   │
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── index.js
-│   │   │
-│   │   ├── assets/
-│   │   │   └── ...
-│   │   │
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── Sidebar.jsx
-│   │   │   ├── PostCard.jsx
-│   │   │   ├── Comment.jsx
-│   │   │   ├── Notification.jsx
-│   │   │   └── ...
-│   │   │
-│   │   ├── contexts/
-│   │   │   ├── AuthContext.jsx
-│   │   │   └── LanguageContext.jsx
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── ForgotPassword.jsx
-│   │   │   ├── ResetPassword.jsx
-│   │   │   ├── Profile.jsx
-│   │   │   ├── Questions.jsx
-│   │   │   ├── QuestionDetails.jsx
-│   │   │   ├── AskQuestion.jsx
-│   │   │   ├── Jobs.jsx
-│   │   │   ├── PostJob.jsx
-│   │   │   ├── TransferReputation.jsx
-│   │   │   ├── ReputationHistory.jsx
-│   │   │   ├── Notifications.jsx
-│   │   │   ├── Subscriptions.jsx
-│   │   │   ├── PaymentSuccess.jsx
-│   │   │   ├── PaymentCancel.jsx
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── AdminReports.jsx
-│   │   │   ├── SecurityLogs.jsx
-│   │   │   └── ...
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   │
-│   ├── .env                 # Local only, NOT committed
-│   ├── .env.example
-│   ├── package.json
-│   └── vite.config.js
-│
-├── server/
-│   ├── config/
-│   │   ├── db.js
-│   │   └── ...
-│   │
-│   ├── controllers/
-│   │   ├── userController.js
-│   │   ├── questionController.js
-│   │   ├── answerController.js
-│   │   ├── postController.js
-│   │   ├── jobController.js
-│   │   ├── reputationController.js
-│   │   ├── notificationController.js
-│   │   ├── subscriptionController.js
-│   │   ├── adminController.js
-│   │   └── ...
-│   │
-│   ├── middleware/
-│   │   ├── authMiddleware.js
-│   │   ├── adminMiddleware.js
-│   │   ├── uploadMiddleware.js
-│   │   └── ...
-│   │
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Question.js
-│   │   ├── Answer.js
-│   │   ├── Post.js
-│   │   ├── Comment.js
-│   │   ├── Notification.js
-│   │   ├── ReputationHistory.js
-│   │   ├── ReputationTransfer.js
-│   │   ├── Session.js
-│   │   ├── LoginActivity.js
-│   │   ├── Subscription.js
-│   │   ├── Payment.js
-│   │   ├── Job.js
-│   │   └── ...
-│   │
-│   ├── routes/
-│   │   ├── userRoutes.js
-│   │   ├── questionRoutes.js
-│   │   ├── answerRoutes.js
-│   │   ├── postRoutes.js
-│   │   ├── jobRoutes.js
-│   │   ├── reputationRoutes.js
-│   │   ├── notificationRoutes.js
-│   │   ├── subscriptionRoutes.js
-│   │   ├── adminRoutes.js
-│   │   ├── translationRoutes.js
-│   │   └── ...
-│   │
-│   ├── services/
-│   │   ├── emailService.js
-│   │   ├── otpService.js
-│   │   ├── paymentService.js
-│   │   ├── reputationService.js
-│   │   └── ...
-│   │
-│   ├── utils/
-│   │   ├── cloudinary.js
-│   │   ├── sendEmail.js
-│   │   ├── translation.js
-│   │   └── ...
-│   │
-│   ├── uploads/
-│   │   └── ...
-│   │
-│   ├── server.js
-│   ├── package.json
-│   ├── .env                 # Local only, NOT committed
-│   └── .env.example
-│
-├── .gitignore
-├── README.md
-└── package.json
+|
++-- client/
+|   |
+|   +-- public/
+|   |   +-- favicon.ico
+|   |   +-- ...
+|   |
+|   +-- src/
+|       |
+|       +-- api/
+|       |   +-- index.js
+|       |
+|       +-- assets/
+|       |   +-- ...
+|       |
+|       +-- components/
+|       |   +-- Navbar.jsx
+|       |   +-- Sidebar.jsx
+|       |   +-- PostCard.jsx
+|       |   +-- Comment.jsx
+|       |   +-- Notification.jsx
+|       |   +-- ...
+|       |
+|       +-- contexts/
+|       |   +-- AuthContext.jsx
+|       |   +-- LanguageContext.jsx
+|       |
+|       +-- pages/
+|       |   +-- Home.jsx
+|       |   +-- Login.jsx
+|       |   +-- Register.jsx
+|       |   +-- ForgotPassword.jsx
+|       |   +-- ResetPassword.jsx
+|       |   +-- Profile.jsx
+|       |   +-- Questions.jsx
+|       |   +-- QuestionDetails.jsx
+|       |   +-- AskQuestion.jsx
+|       |   +-- Jobs.jsx
+|       |   +-- PostJob.jsx
+|       |   +-- TransferReputation.jsx
+|       |   +-- ReputationHistory.jsx
+|       |   +-- Notifications.jsx
+|       |   +-- Subscriptions.jsx
+|       |   +-- PaymentSuccess.jsx
+|       |   +-- PaymentCancel.jsx
+|       |   +-- AdminDashboard.jsx
+|       |   +-- AdminReports.jsx
+|       |   +-- SecurityLogs.jsx
+|       |   +-- ...
+|       |
+|       +-- App.jsx
+|       +-- main.jsx
+|       +-- index.css
+|   
+|   +-- .env
+|   +-- .env.example
+|   +-- package.json
+|   +-- vite.config.js
+|
++-- server/
+|   |
+|   +-- config/
+|   |   +-- db.js
+|   |   +-- ...
+|   |
+|   +-- controllers/
+|   |   +-- userController.js
+|   |   +-- questionController.js
+|   |   +-- answerController.js
+|   |   +-- postController.js
+|   |   +-- jobController.js
+|   |   +-- reputationController.js
+|   |   +-- notificationController.js
+|   |   +-- subscriptionController.js
+|   |   +-- adminController.js
+|   |   +-- ...
+|   |
+|   +-- middleware/
+|   |   +-- authMiddleware.js
+|   |   +-- adminMiddleware.js
+|   |   +-- uploadMiddleware.js
+|   |   +-- ...
+|   |
+|   +-- models/
+|   |   +-- User.js
+|   |   +-- Question.js
+|   |   +-- Answer.js
+|   |   +-- Post.js
+|   |   +-- Comment.js
+|   |   +-- Notification.js
+|   |   +-- ReputationHistory.js
+|   |   +-- ReputationTransfer.js
+|   |   +-- Session.js
+|   |   +-- LoginActivity.js
+|   |   +-- Subscription.js
+|   |   +-- Payment.js
+|   |   +-- Job.js
+|   |   +-- ...
+|   |
+|   +-- routes/
+|   |   +-- userRoutes.js
+|   |   +-- questionRoutes.js
+|   |   +-- answerRoutes.js
+|   |   +-- postRoutes.js
+|   |   +-- jobRoutes.js
+|   |   +-- reputationRoutes.js
+|   |   +-- notificationRoutes.js
+|   |   +-- subscriptionRoutes.js
+|   |   +-- adminRoutes.js
+|   |   +-- translationRoutes.js
+|   |   +-- ...
+|   |
+|   +-- services/
+|   |   +-- emailService.js
+|   |   +-- otpService.js
+|   |   +-- paymentService.js
+|   |   +-- reputationService.js
+|   |   +-- ...
+|   |
+|   +-- utils/
+|   |   +-- cloudinary.js
+|   |   +-- sendEmail.js
+|   |   +-- translation.js
+|   |   +-- ...
+|   |
+|   +-- uploads/
+|   |   +-- ...
+|   |
+|   +-- server.js
+|   +-- package.json
+|   +-- .env
+|   +-- .env.example
+|
++-- .gitignore
++-- README.md
++-- package.json
 
 # 🛠️ TECHNOLOGIES AND TOOLS USED
 
