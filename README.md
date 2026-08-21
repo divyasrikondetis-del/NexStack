@@ -662,35 +662,6 @@ NexStack uses performance-oriented techniques such as:
 
 ---
 
-# 🔗 API ARCHITECTURE
-
-The frontend communicates with the backend through REST APIs.
-
-Architecture:
-
-React
-  ↓
-Axios
-  ↓
-Express REST API
-  ↓
-Routes
-  ↓
-Controllers
-  ↓
-Mongoose
-  ↓
-MongoDB
-
-Production API:
-
-https://nexstack-3.onrender.com/api
-
-Health endpoint:
-
-https://nexstack-3.onrender.com/api/health
-
----
 
 # 🔐 JWT REQUEST FLOW
 
