@@ -1,62 +1,60 @@
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 const sendEmail = async (to, subject, html) => {
-  // Check email credentials
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log(
-      "📧 Email delivery skipped; EMAIL_USER and EMAIL_PASS are not configured."
-    );
-    console.log("📧 Would have sent to:", to);
-    console.log("📧 Subject:", subject);
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail =
+    process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+
+  if (!apiKey) {
+    console.error("❌ RESEND_API_KEY is not configured.");
 
     return {
       skipped: true,
-      reason: "EMAIL_USER and EMAIL_PASS are not configured.",
+      reason: "RESEND_API_KEY is not configured on the server.",
     };
   }
 
   try {
-    // Gmail SMTP configuration
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+    const response = await axios.post(
+      "https://api.resend.com/emails",
+      {
+        from: `NexStack <${fromEmail}>`,
+        to: [to],
+        subject,
+        html,
       },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 10000,
+      }
+    );
 
-      requireTLS: true,
+    const messageId = response.data?.id;
 
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
+    if (!messageId) {
+      throw new Error("Email provider did not return a message ID.");
+    }
 
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"NexStack" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
-
-    console.log("✅ Email sent:", info.messageId);
+    console.log("✅ Email accepted by Resend:", messageId);
     console.log("📧 To:", to);
     console.log("📧 Subject:", subject);
 
     return {
       success: true,
-      messageId: info.messageId,
+      messageId,
     };
   } catch (error) {
-    console.error("❌ Email error:", error);
+    const providerMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message;
 
-    throw error;
+    console.error("❌ Resend email error:", providerMessage);
+
+    throw new Error(providerMessage);
   }
 };
 
